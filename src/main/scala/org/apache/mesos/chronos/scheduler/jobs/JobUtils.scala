@@ -91,16 +91,19 @@ object JobUtils {
       case Some((rec, start, per)) =>
         val skip = calculateSkips(currentDateTime, start, per)
         if (rec == -1) {
-          val nStart = start.plus(per.multipliedBy(skip))
+          // don't retry so it won't cause the forever repetition.
+          /*val nStart = start.plus(per.multipliedBy(skip))
           log.warning(
             "Skipped forward %d iterations, modified start from '%s' to '%s"
               .format(skip,
-                      start.toString(DateTimeFormat.fullDate),
-                      nStart.toString(DateTimeFormat.fullDate)))
+                start.toString(DateTimeFormat.fullDate),
+                nStart.toString(DateTimeFormat.fullDate)))
+
           Some(
             new JobSchedule(Iso8601Expressions.create(rec, nStart, per),
                             job.name,
-                            job.scheduleTimeZone))
+                            job.scheduleTimeZone))*/
+          None
         } else {
           val nRec = rec - 1
           val nStart = start.plus(per.multipliedBy(skip))
@@ -110,10 +113,14 @@ object JobUtils {
                       nRec,
                       start.toString(DateTimeFormat.fullDate),
                       nStart.toString(DateTimeFormat.fullDate)))
-          Some(
-            new JobSchedule(Iso8601Expressions.create(nRec, nStart, per),
-                            job.name,
-                            job.scheduleTimeZone))
+          if (nRec != -1) {
+            Some(
+              new JobSchedule(Iso8601Expressions.create(nRec, nStart, per),
+                job.name,
+                job.scheduleTimeZone))
+          }
+          else
+            None
         }
       case None =>
         None
