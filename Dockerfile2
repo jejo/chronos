@@ -1,0 +1,5 @@
+FROM mesosphere/chronos:v3.0.2-DCOS
+
+ADD ./tmp/chronos.jar /chronos/chronos.jar
+
+ENTRYPOINT ["/chronos/bin/start.sh"]

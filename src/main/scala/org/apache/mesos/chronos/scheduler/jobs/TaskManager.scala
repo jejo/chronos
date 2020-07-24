@@ -81,8 +81,7 @@ class TaskManager @Inject()(
   def addTask(jobName: String, slaveId: String, taskId: String) {
     val newTask = new ChronosTask(slaveId, taskId)
     if (runningTasks.contains(jobName)) {
-      val tasks = runningTasks(jobName) ++ List(newTask)
-      runningTasks(jobName) = tasks
+      log.info("Dragon: Duplicate Task Not Allowed")
     } else {
       runningTasks(jobName) = List(newTask)
     }

@@ -120,10 +120,11 @@ class MesosJobFramework @Inject()(
       taskManager.getTaskFromQueue match {
         case None => log.fine("No tasks scheduled or next task has been disabled.\n")
         case Some((taskId, job)) =>
-          if (taskManager.jobIsRunning(job.name) && !job.concurrent) {
+          if (taskManager.jobIsRunning(job.name)) {
             log.warning("The head of the task queue appears to already be running and doesn't allow concurrency: " + job.name + "\n")
             generate()
           } else {
+            log.info("Dragon: Checking job for task queue taskId:"+ taskId + " with job:" + job.name);
             tasks.find(_._2.name == job.name) match {
               case Some((subtaskId, subJob, offer)) =>
                 log.warning("Found job in queue that is already scheduled for launch with this offer set: " + subJob.name + "\n")
@@ -171,7 +172,13 @@ class MesosJobFramework @Inject()(
         for (task <- tasks) {
           val name = task._2.name
           taskManager.addTask(name, task._3.getSlaveId.getValue, task._1)
-          scheduler.handleLaunchedTask(task._2)
+
+          log.info("Dragon: Checking " +  name + " if running")
+          if (taskManager.jobIsRunning(name)) {
+            log.info("Dragon: Running task. handling launched task")
+            scheduler.handleLaunchedTask(task._2)
+          }
+
 
           log.info(s"Task '${task._1}' launched")
         }
