@@ -214,7 +214,7 @@ class TaskManager @Inject()(
 
   def queueContains(taskId: String): Boolean = {
     val jobName = TaskUtils.getJobNameForTaskId(taskId)
-    queuedJobs.contains(jobName)
+    queuedJobs.contains(jobName) || runningTasks.contains(jobName)
   }
 
   def setAsQueued(taskId: String): Unit = {
