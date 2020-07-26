@@ -160,6 +160,7 @@ class TaskManager @Inject()(
     val queue = queues(num)
     val name = names(num)
     val taskId = queue.poll()
+    log.info("Dragon: Checking task id: "+taskId+" from queue: " +num )
     if (taskId == null) {
       log.fine(s"$name queue empty")
       None
