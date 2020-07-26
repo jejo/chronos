@@ -94,6 +94,8 @@ class MesosJobFramework @Inject()(
     val offers = receivedOffers.asScala.toList
     val offerResources = mutable.HashMap(offers.map(o => (o, Resources(o))).toSeq: _*)
     val tasksToLaunch = generateLaunchableTasks(offerResources)
+    log.info("Dragon tasksToLaunch:")
+    println(tasksToLaunch)
 
     log.fine("Declining unused offers.")
     val usedOffers = mutable.HashSet(tasksToLaunch.map(_._3.getId.getValue): _*)
@@ -210,6 +212,9 @@ class MesosJobFramework @Inject()(
       case TaskState.TASK_STAGING =>
         taskManager.updateRunningTask(taskStatus)
         scheduler.handleStartedTask(taskStatus)
+      case TaskState.TASK_STARTING =>
+        taskManager.updateRunningTask(taskStatus)
+        scheduler.handleStartedTask(taskStatus)
       case _ =>
         taskManager.removeTask(taskId)
     }
@@ -229,6 +234,8 @@ class MesosJobFramework @Inject()(
       case TaskState.TASK_KILLED =>
         log.info("Task with id '%s' KILLED".format(taskId))
         scheduler.handleKilledTask(taskStatus)
+      case TaskState.TASK_STARTING =>
+        log.info("Dragon Task with id '%s' STARTING".format(taskId))
       case _ =>
         log.warning("Unknown TaskState:" + taskStatus.getState + " for task: " + taskId)
     }
