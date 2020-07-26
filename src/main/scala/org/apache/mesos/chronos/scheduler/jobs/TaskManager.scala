@@ -70,6 +70,10 @@ class TaskManager @Inject()(
     runningTasks.getOrElse(jobName, List()).size
   }
 
+  def getChronosTaskId(jobName: String): String = {
+    runningTasks(jobName)(0).taskId
+  }
+
   def jobIsRunning(jobName: String): Boolean = {
     runningTasks.contains(jobName)
   }
