@@ -169,13 +169,8 @@ class JobScheduler @Inject()(val taskManager: TaskManager,
     val jobName = TaskUtils.getJobNameForTaskId(taskId)
     val jobOption = jobGraph.lookupVertex(jobName)
 
-    val chronosTaskId = taskManager.getChronosTaskId(jobName)
-
     if (jobOption.isEmpty) {
       log.warning("JobSchedule '%s' no longer registered.".format(jobName))
-    } else if (chronosTaskId != taskId) {
-      log.info("Dragon taskId: " + taskId + ", chronosTaskId: " + chronosTaskId)
-      log.info(s"Dragon: Job ${jobName}... has mis-matching task IDs from chronos. Will not do anything")
     } else {
       val job = jobOption.get
       val (_, _, attempt, _) = TaskUtils.parseTaskId(taskId)

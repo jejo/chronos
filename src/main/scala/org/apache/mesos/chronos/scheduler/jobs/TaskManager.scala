@@ -70,10 +70,6 @@ class TaskManager @Inject()(
     runningTasks.getOrElse(jobName, List()).size
   }
 
-  def getChronosTaskId(jobName: String): String = {
-    runningTasks(jobName)(0).taskId
-  }
-
   def jobIsRunning(jobName: String): Boolean = {
     runningTasks.contains(jobName)
   }
@@ -85,7 +81,8 @@ class TaskManager @Inject()(
   def addTask(jobName: String, slaveId: String, taskId: String) {
     val newTask = new ChronosTask(slaveId, taskId)
     if (runningTasks.contains(jobName)) {
-      log.info("Dragon: Duplicate Task Not Allowed")
+      val tasks = runningTasks(jobName) ++ List(newTask)
+      runningTasks(jobName) = tasks
     } else {
       runningTasks(jobName) = List(newTask)
     }
@@ -219,7 +216,7 @@ class TaskManager @Inject()(
 
   def queueContains(taskId: String): Boolean = {
     val jobName = TaskUtils.getJobNameForTaskId(taskId)
-    queuedJobs.contains(jobName) || runningTasks.contains(jobName)
+    queuedJobs.contains(jobName)
   }
 
   def setAsQueued(taskId: String): Unit = {
